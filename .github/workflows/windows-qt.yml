@@ -46,7 +46,7 @@ jobs:
     - name: Deploy
       run: |
         mkdir upload
-        move build/Release/shadPS4.exe upload
+        move build/bin/Release/shadPS4.exe upload
         windeployqt --dir upload upload/shadPS4.exe
 
     - name: Upload executable
