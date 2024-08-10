@@ -70,9 +70,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/common/scm_rev.cpp.in" "${CMAKE_
 
 find_package(Boost 1.84.0 CONFIG)
 find_package(cryptopp 8.9.0 MODULE)
+if (APPLE)
+    find_package(date 3.0.1 CONFIG)
+endif()
 find_package(fmt 10.2.1 CONFIG)
 find_package(glslang 14.2.0 CONFIG)
 find_package(magic_enum 0.9.6 CONFIG)
+find_package(RenderDoc MODULE)
 find_package(SDL3 3.1.2 CONFIG)
 find_package(toml11 3.8.1 CONFIG)
 find_package(tsl-robin-map 1.3.0 CONFIG)
@@ -82,11 +86,7 @@ find_package(xbyak 7.07 CONFIG)
 find_package(xxHash 0.8.2 MODULE)
 find_package(zlib-ng 2.2.0 MODULE)
 find_package(Zydis 4.1.0 CONFIG)
-find_package(RenderDoc MODULE)
 
-if (APPLE)
-    find_package(date 3.0.1 CONFIG)
-endif()
 
 # Note: Windows always has these functions through winpthreads
 include(CheckSymbolExists)
@@ -525,34 +525,34 @@ set(EMULATOR src/emulator.cpp
 # The above is shared in SDL and Qt version (TODO share them all)
 
 if(ENABLE_QT_GUI)
-qt_add_resources(RESOURCE_FILES src/shadps4.qrc)
+    qt_add_resources(RESOURCE_FILES src/shadps4.qrc)
 
-set(QT_GUI 
-    src/qt_gui/main_window_ui.h
-    src/qt_gui/main_window.cpp
-    src/qt_gui/main_window.h
-    src/qt_gui/gui_context_menus.h
-    src/qt_gui/game_list_utils.h
-    src/qt_gui/game_info.cpp
-    src/qt_gui/game_info.h
-    src/qt_gui/game_list_frame.cpp
-    src/qt_gui/game_list_frame.h
-    src/qt_gui/game_grid_frame.cpp
-    src/qt_gui/game_grid_frame.h
-    src/qt_gui/game_install_dialog.cpp
-    src/qt_gui/game_install_dialog.h
-    src/qt_gui/pkg_viewer.cpp
-    src/qt_gui/pkg_viewer.h
-    src/qt_gui/trophy_viewer.cpp
-    src/qt_gui/trophy_viewer.h
-    src/qt_gui/elf_viewer.cpp
-    src/qt_gui/elf_viewer.h
-    src/qt_gui/main_window_themes.cpp
-    src/qt_gui/main_window_themes.h
-    src/qt_gui/main.cpp
-    ${EMULATOR}
-    ${RESOURCE_FILES}
-    )
+    set(QT_GUI 
+        src/qt_gui/main_window_ui.h
+        src/qt_gui/main_window.cpp
+        src/qt_gui/main_window.h
+        src/qt_gui/gui_context_menus.h
+        src/qt_gui/game_list_utils.h
+        src/qt_gui/game_info.cpp
+        src/qt_gui/game_info.h
+        src/qt_gui/game_list_frame.cpp
+        src/qt_gui/game_list_frame.h
+        src/qt_gui/game_grid_frame.cpp
+        src/qt_gui/game_grid_frame.h
+        src/qt_gui/game_install_dialog.cpp
+        src/qt_gui/game_install_dialog.h
+        src/qt_gui/pkg_viewer.cpp
+        src/qt_gui/pkg_viewer.h
+        src/qt_gui/trophy_viewer.cpp
+        src/qt_gui/trophy_viewer.h
+        src/qt_gui/elf_viewer.cpp
+        src/qt_gui/elf_viewer.h
+        src/qt_gui/main_window_themes.cpp
+        src/qt_gui/main_window_themes.h
+        src/qt_gui/main.cpp
+        ${EMULATOR}
+        ${RESOURCE_FILES}
+        )
 endif()
 
 if (ENABLE_QT_GUI)
