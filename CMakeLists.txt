@@ -21,6 +21,7 @@ project(shadPS4)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
+option(SHADPS4_USE_BUNDLED_QT "Download bundled Qt binaries" OFF)
 
 # This function should be passed a list of all files in a target. It will automatically generate file groups
 # following the directory hierarchy, so that the layout of the files in IDEs matches the one in the filesystem.
@@ -103,6 +104,11 @@ add_subdirectory(externals)
 include_directories(src)
 
 if(ENABLE_QT_GUI)
+    if (SHADPS4_USE_BUNDLED_QT)
+        include(DownloadExternals)
+        set(ARCHITECTURE "x86_64") # TODO(SachinV): Don't hardcode
+        download_qt(6.7.2)
+    endif()
     find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent)
     qt_standard_project_setup()
     set(CMAKE_AUTORCC ON)
@@ -658,4 +664,37 @@ if (ENABLE_QT_GUI)
 
     set_source_files_properties(src/images/shadPS4.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources)
-endif()
+
+    if (WIN32)
+        # Delegate to Qt's official deployment binary on Windows to copy over the necessary Qt-specific libraries, etc.
+        get_target_property(MOC_EXECUTABLE_LOCATION Qt6::moc IMPORTED_LOCATION)
+        get_filename_component(QT_BINARY_DIRECTORY "${MOC_EXECUTABLE_LOCATION}" DIRECTORY)
+        find_program(WINDEPLOYQT_EXE windeployqt HINTS "${QT_BINARY_DIRECTORY}")
+
+        # Note: We set the PATH for the duration of this command so that the
+        #       deployment application is able to locate the Qt libraries to copy.
+        #       if the necessary paths aren't already set beforehand.
+        #
+        #       For example, consider a hypothetical emulation project named Orca.
+        #       Orca supplies its own version of Qt instead of having developers actually
+        #       install the officially supported Qt libraries -- a method that would make
+        #       wrangling around with Qt through CMake much nicer and lessen the external
+        #       library maintenance burden of the project, but alas.
+        #
+        #       In this case, as Qt is not installed through the official binary, this also
+        #       means proper path variables will not be set up, thus the need to ensure they're
+        #       always set up.
+        #
+        add_custom_command(TARGET shadps4 POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E env PATH="${QT_BINARY_DIRECTORY}"
+                "${WINDEPLOYQT_EXE}" --libdir="${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                                        --plugindir="${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                                        $<IF:$<CONFIG:Debug>,--debug,--release>
+                                        --no-translations
+                                        --no-compiler-runtime
+                                        --no-system-d3d-compiler
+                                        --no-opengl-sw
+                                        "$<TARGET_FILE:shadps4>"
+        )
+    endif(WIN32)
+endif(ENABLE_QT_GUI)
