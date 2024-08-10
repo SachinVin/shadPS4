@@ -50,7 +50,7 @@ jobs:
     - name: Package
       run: |
         mkdir upload
-        mv ${{github.workspace}}/build/shadps4.app upload
+        mv ${{github.workspace}}/build/bin/shadps4.app upload
         macdeployqt upload/shadps4.app
         tar cf shadps4-macos-qt.tar.gz -C upload .
 

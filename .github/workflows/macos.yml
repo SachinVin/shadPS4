@@ -42,7 +42,7 @@ jobs:
     - name: Package
       run: |
         mkdir upload
-        mv ${{github.workspace}}/build/shadps4 upload
+        mv ${{github.workspace}}/build/bin/shadps4 upload
         cp $(arch -x86_64 /usr/local/bin/brew --prefix)/opt/molten-vk/lib/libMoltenVK.dylib upload
         install_name_tool -add_rpath "@loader_path" upload/shadps4
         tar cf shadps4-macos.tar.gz -C upload .

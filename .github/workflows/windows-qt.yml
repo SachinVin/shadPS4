@@ -25,19 +25,10 @@ jobs:
       with:
           submodules: recursive
 
-    - name: Setup Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: 6.7.2
-        host: windows
-        target: desktop
-        arch: win64_msvc2019_64
-        archives: qtbase
-
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -T ClangCL -DENABLE_QT_GUI=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -T ClangCL -DENABLE_QT_GUI=ON -DSHADPS4_USE_BUNDLED_QT=ON
 
     - name: Build
       # Build your program with the given configuration
@@ -46,7 +37,7 @@ jobs:
     - name: Deploy
       run: |
         mkdir upload
-        move build/Release/shadPS4.exe upload
+        move build/bin/Release/shadPS4.exe upload
         windeployqt --dir upload upload/shadPS4.exe
 
     - name: Upload executable

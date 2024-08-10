@@ -17,6 +17,9 @@ endif()
 
 project(shadPS4)
 
+# Output binaries to bin/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
 option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
 
 # This function should be passed a list of all files in a target. It will automatically generate file groups
